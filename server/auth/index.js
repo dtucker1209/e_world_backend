@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 
+
 const prisma = new PrismaClient();
 const JWT = process.env.JWT;
 
@@ -58,15 +59,7 @@ router.post("/login", async (req, res, next) => {
 // Get the currently logged in instructor
 router.get("/me", async (req, res, next) => {
   try {
-    // const { id } = req.body;
     console.log(req.user)
-    // const user = await prisma.instructor.findUnique({where: {id}});
-    // const {
-    //   rows: [instructor],
-    // } = await db.query("SELECT * FROM instructor WHERE id = $1", [
-    //   req.user?.id,
-    // ]);
-
     res.send(req.user);
     
   } catch (error) {

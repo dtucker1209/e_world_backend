@@ -8,7 +8,8 @@
     "server:dev": "JWT=JWT node --watch server",
     "server:dev:windows": "set JWT=JWT && node --watch server",
     "build": "vite build client",
-    "server": "node server"
+    "server": "node server",
+    "dev": "nodemon server/auth/index.js"
   },
   "author": "Adrian",
   "license": "ISC",
@@ -20,12 +21,15 @@
     "vite": "^4.3.9"
   },
   "dependencies": {
-    "@prisma/client": "^6.3.0",
+    "@prisma/client": "^6.3.1",
     "@reduxjs/toolkit": "^1.9.5",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
+    "nodemon": "^3.1.9",
     "pg": "^8.11.0",
     "prisma": "^6.3.1",
     "react": "^18.2.0",
