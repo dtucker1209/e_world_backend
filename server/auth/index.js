@@ -39,7 +39,7 @@ router.post("/login", async (req, res, next) => {
     const user = await prisma.user.findUnique({where: {username}});
 
     if (!user) {
-      return res.status(401).send("Invalid login credentials.");
+      return res.status(401).send("No user found.");
     }
 
     const isValid = await bcrypt.compare(password, user.password);
@@ -59,9 +59,16 @@ router.post("/login", async (req, res, next) => {
 // Get the currently logged in instructor
 router.get("/me", async (req, res, next) => {
   try {
-    console.log(req.user)
-    res.send(req.user);
-    
+    const user= await prisma.user.findUnique({
+      where:{
+        id: req.user?.id
+      }
+    });
+    if(!user){
+      return res.status(404).send("user not found")
+    }
+    console.log(user);
+    res.send(user);
   } catch (error) {
     next(error);
   }
