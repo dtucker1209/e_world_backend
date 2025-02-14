@@ -1,11 +1,14 @@
 const router = require("express").Router();
-const { prisma } = require("../db");
+const {PrismaClient} = require("@prisma/client");
+const prisma = new PrismaClient();
+const db = require("../db");
+
 
 /* Create review */
 
 router.post("/item/:id", async (req, res, next) => {
     try {
-        const item = await prisma.Item.update({
+        const item = await prisma.review.update({
                 where: {
                     id: Number(req.params.id)
                 },
@@ -22,8 +25,6 @@ router.post("/item/:id", async (req, res, next) => {
                     review: true
                 }
             })
-            
-
         if (!item) {
             return res.status(404).send("Review not found");
         }

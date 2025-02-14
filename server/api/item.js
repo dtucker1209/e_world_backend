@@ -14,7 +14,7 @@ const db = require("../db");
 
 router.get("/", async (req, res, next) => {
   try {
-    
+
     const items = await prisma.item.findMany();
     if (items.length === 0) {
       console.log("no items found in the table");
@@ -52,9 +52,7 @@ router.get("/:id", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     const item = await prisma.Item.create({
-      // // where: {
-      // //     id: req.params.id
-      // },
+     
       data: {
         name: req.body.name,
         description: req.body.description,
