@@ -8,7 +8,7 @@
     "server:dev": "JWT=JWT node --watch server",
     "server:dev:windows": "set JWT=JWT && node --watch server",
     "build": "vite build client",
-    "server": "node server"
+    "server": "nodemon server"
   },
   "author": "Adrian",
   "license": "ISC",
