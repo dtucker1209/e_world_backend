@@ -3,12 +3,28 @@ const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 const db = require("../db");
 
-// router.use((req, res, next) => {
-//     if (!req.user) {
-//         return res.status(401).send("You must be logged in to do that!");
-//     }
-//     next();
-// });
+const getUser = async (id) => {
+  const response = await prisma.user.findFirstOrThrow({
+    where: {
+      id,
+    },
+  });
+  return response;
+};
+
+const isLoggedIn = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.slice(7);
+  if (!token) return next();
+  try {
+    const { id } = jwt.verify(token, JWT);
+    const user = await getUser(id);
+    req.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 
 /* Get all items */
 
@@ -49,7 +65,7 @@ router.get("/:id", async (req, res, next) => {
 
 /* Create an item */
 
-router.post("/", async (req, res, next) => {
+router.post("/", isLoggedIn, async (req, res, next) => {
   try {
     const item = await prisma.Item.create({
      

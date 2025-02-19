@@ -16,19 +16,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "..", "client/dist")));
 
 // Check requests for a token and attach the decoded id to the request
-app.use((req, res, next) => {
-  const auth = req.headers.authorization;
-  const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+// app.use((req, res, next) => {
+//   const auth = req.headers.authorization;
+//   const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
 
-  try {
-    req.user = jwt.verify(token, process.env.JWT);
-    console.log(req.user)
-  } catch {
-    req.user = null;
-  }
+//   try {
+//     req.user = jwt.verify(token, process.env.JWT);
+//     console.log(req.user)
+//   } catch {
+//     req.user = null;
+//   }
 
-  next();
-});
+//   next();
+// });
 
 // Backend routes
 app.use("/auth", require("./auth"));

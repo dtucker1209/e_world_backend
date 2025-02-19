@@ -4,26 +4,40 @@ const prisma = new PrismaClient();
 const db = require("../db");
 
 
+const getUser = async (id) => {
+    const response = await prisma.user.findFirstOrThrow({
+      where: {
+        id,
+      },
+    });
+    return response;
+  };
+  
+  const isLoggedIn = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.slice(7);
+    if (!token) return next();
+    try {
+      const { id } = jwt.verify(token, JWT);
+      const user = await getUser(id);
+      req.user = user;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 /* Create review */
 
-router.post("/item/:id", async (req, res, next) => {
+router.post("/items/:itemId", isLoggedIn, async (req, res, next) => {
     try {
-        const item = await prisma.review.update({
-                where: {
-                    id: Number(req.params.id)
-                },
+        const item = await prisma.review.create({
                 data: {
-                    review: {
-                        create: {                       
-                            rating: Number(req.body.rating),
-                            text: req.body.text,
-                            userId: Number(req.body.userId)                       
-                        }
-                    }
+                text: req.body.text,
+                rating: req.body.rating,
+                userId: req.user.id,
+                itemId: +req.params.itemId
                 },
-                include: {
-                    review: true
-                }
+                
             })
         if (!item) {
             return res.status(404).send("Review not found");
@@ -38,11 +52,12 @@ router.post("/item/:id", async (req, res, next) => {
 
 /* Update a review */
 
-router.put("/:id", async (req, res, next) => {
+router.put("/:reviewId", isLoggedIn, async (req, res, next) => {
     try {
-        const review = await prisma.Review.update({
+        const review = await prisma.review.update({
                 where: {
-                    id: Number(req.params.id)
+                    id: Number(req.params.reviewId),
+                    
                 },
                 data: {                   
                     rating: Number(req.body.rating),
@@ -60,11 +75,11 @@ router.put("/:id", async (req, res, next) => {
     }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:reviewId", isLoggedIn, async (req, res, next) => {
     try {
-        const review = await prisma.Review.delete({
+        const review = await prisma.review.delete({
             where: {
-                id: Number(req.params.id)
+                id: Number(req.params.reviewId)
             }
         })
         if (!review) {

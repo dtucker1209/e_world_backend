@@ -3,10 +3,34 @@ const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+// const isLoggedIn = require("../common")
 
 
 const prisma = new PrismaClient();
 const JWT = process.env.JWT;
+
+const getUser = async (id) => {
+  const response = await prisma.user.findFirstOrThrow({
+    where: {
+      id,
+    },
+  });
+  return response;
+};
+
+const isLoggedIn = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.slice(7);
+  if (!token) return next();
+  try {
+    const { id } = jwt.verify(token, JWT);
+    const user = await getUser(id);
+    req.user = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 
 // Register a new User account
 router.post("/register", async (req, res, next) => {
@@ -57,7 +81,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 // Get the currently logged in instructor
-router.get("/me", async (req, res, next) => {
+router.get("/me", isLoggedIn, async (req, res, next) => {
   try {
     const user= await prisma.user.findUnique({
       where:{
