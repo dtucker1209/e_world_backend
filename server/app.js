@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const app = express();
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
+const cors = require ("cors");
+app.use(cors());
 
 // Logging middleware
 app.use(morgan("dev"));
@@ -15,21 +17,17 @@ app.use(express.urlencoded({ extended: true }));
 // Static file-serving middleware
 app.use(express.static(path.join(__dirname, "..", "client/dist")));
 
-// Check requests for a token and attach the decoded id to the request
-// app.use((req, res, next) => {
-//   const auth = req.headers.authorization;
-//   const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
-
-//   try {
-//     req.user = jwt.verify(token, process.env.JWT);
-//     console.log(req.user)
-//   } catch {
-//     req.user = null;
-//   }
-
-//   next();
-// });
-
+app.use(function(req,res,next){
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://e-world-backend.onrender.com/api"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+})
 // Backend routes
 app.use("/auth", require("./auth"));
 app.use("/api", require("./api"));
