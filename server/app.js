@@ -5,7 +5,7 @@ const app = express();
 const jwt = require("jsonwebtoken");
 require('dotenv').config();
 const cors = require ("cors");
-app.use(cors());
+app.use(cors({origin: 'http://localhost:5173',}));
 
 // Logging middleware
 app.use(morgan("dev"));
@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, "..", "client/dist")));
 app.use(function(req,res,next){
   res.header(
     "Access-Control-Allow-Origin",
-    "http://localhost:5173"
+    "https://e-world-backend.onrender.com/"
   );
   res.header(
     "Access-Control-Allow-Headers",
