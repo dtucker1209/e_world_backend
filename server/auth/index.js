@@ -3,7 +3,7 @@ const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
-// const isLoggedIn = require("../common")
+
 
 
 const prisma = new PrismaClient();
