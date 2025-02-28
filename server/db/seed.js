@@ -34,7 +34,7 @@ async function main() {
   /* creates relational fields for items */
   
   Items.forEach(async (Item) => {
-      await prisma.Item.update({
+      await prisma.item.update({
           where: {
               id: Item.id
           },

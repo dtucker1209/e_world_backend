@@ -20,6 +20,7 @@ model User {
   email    String    @unique
   password String
   review   Review[]
+  cart      Cart?
   
 }
 
@@ -28,7 +29,24 @@ model Item {
   name        String   
   description String
   review      Review[]
+  cartItems   CartItem[]
 }
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id])
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id       Int @id @default(autoincrement())
+  cartId   Int
+  cart     Cart  @relation(fields: [cartId], references: [id])
+  itemId   Int
+  item     Item  @relation(fields: [itemId], references: [id])
+  quantity Int
+}
+
 
 model Review {
   id        Int       @id @default(autoincrement())
