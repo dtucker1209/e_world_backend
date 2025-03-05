@@ -28,23 +28,16 @@ model Item {
   id          Int      @id @default(autoincrement())
   name        String   
   description String
+  price Decimal
   review      Review[]
-  cartItems   CartItem[]
+  cart  Cart[] @relation("MyRelationTable")
 }
+
 model Cart {
   id        Int        @id @default(autoincrement())
   userId    Int        @unique
   user      User       @relation(fields: [userId], references: [id])
-  cartItems CartItem[]
-}
-
-model CartItem {
-  id       Int @id @default(autoincrement())
-  cartId   Int
-  cart     Cart  @relation(fields: [cartId], references: [id])
-  itemId   Int
-  item     Item  @relation(fields: [itemId], references: [id])
-  quantity Int
+  item Item[] @relation("MyRelationTable")
 }
 
 

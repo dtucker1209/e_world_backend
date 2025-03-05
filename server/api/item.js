@@ -72,6 +72,7 @@ router.post("/", isLoggedIn, async (req, res, next) => {
       data: {
         name: req.body.name,
         description: req.body.description,
+        price: req.body.price
       },
     });
     if (!item) {
