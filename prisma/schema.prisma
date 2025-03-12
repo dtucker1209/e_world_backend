@@ -30,14 +30,24 @@ model Item {
   description String
   price Decimal
   review      Review[]
-  cart  Cart[] @relation("MyRelationTable")
+  
 }
 
 model Cart {
   id        Int        @id @default(autoincrement())
   userId    Int        @unique
   user      User       @relation(fields: [userId], references: [id])
-  item Item[] @relation("MyRelationTable")
+  items  CartItem[]
+  
+}
+model CartItem {
+  id       Int    @id @default(autoincrement())
+  cartId   Int
+  itemId   Int @unique
+  price    Float
+ username     String
+  cart     Cart   @relation(fields: [cartId], references: [id])
+  @@unique([cartId, itemId]) // Ensure no duplicate items in the cart
 }
 
 
@@ -51,5 +61,6 @@ model Review {
   userId    Int
   item      Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId    Int
+ 
  
 }

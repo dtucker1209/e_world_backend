@@ -28,6 +28,7 @@ app.use(function(req,res,next){
   );
   next();
 })
+
 // Backend routes
 app.use("/auth", require("./auth"));
 app.use("/api", require("./api"));
