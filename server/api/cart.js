@@ -28,9 +28,17 @@ const getUser = async (id) => {
   };
 
   const fetchItemDetails = async (itemId) => {
+    try{
     const response = await fetch(`https://fakestoreapi.com/products/${itemId}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch item details");
+  }
     const data = await response.json();
     return data;  // Assuming the API returns an object with item details
+}catch (error){
+  console.error("Error fetching item details", error);
+  throw error;
+}
   };
   
   module.exports = fetchItemDetails;
@@ -44,9 +52,14 @@ router.get("/", isLoggedIn, async (req, res, next) => {
         where:{userId: userId},
         include:{items:true},
       });
-      if (!cart || cart.length === 0) {
-       return res.status(404).json({message: "Your cart is empty."});
+      if (!cart) {
+       return res.status(200).json({items:[]}); //Empty Cart is valid
       }
+      if (cart.items.length ===0) {
+        return res.status(200).json({items:[]}); //No items in the cart
+       }
+       console.log("cart data", cart);
+       
       res.send(cart);
     } catch (error) {
       console.error("problem fetching items in your cart", error);
@@ -59,15 +72,15 @@ router.get("/", isLoggedIn, async (req, res, next) => {
     try {
         const {userId, itemId}= req.body;
         if (!itemId || !userId) {
-            return res.status(400).send("Item Id is required");
+            return res.status(400).send("Item Id and UserId are required");
         }
         // Find the item in the item table:
       const itemDetails = await fetchItemDetails(itemId);
-        if(!item){
+        if(!itemDetails){
             return res.status(404).send("Item not found.");
         }
          // Find or create the user's cart
-    const userCart = await prismaClient.cart.upsert({
+    const userCart = await prisma.cart.upsert({
       where: { userId: userId },
       update: {},
       create: {

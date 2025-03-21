@@ -70,9 +70,12 @@ router.post("/", isLoggedIn, async (req, res, next) => {
     const item = await prisma.Item.create({
      
       data: {
-        name: req.body.name,
+        title: req.body.title,
         description: req.body.description,
-        price: req.body.price
+        price: +req.body.price,
+        image: req.body.image,
+        rating: +req.body.rating,
+        count: req.body.count
       },
     });
     if (!item) {
@@ -93,7 +96,7 @@ router.put("/:id", async (req, res, next) => {
         id: Number(req.params.id),
       },
       data: {
-        name: req.body.name,
+        title: req.body.title,
         description: req.body.description,
       },
     });
@@ -123,5 +126,6 @@ router.delete("/:id", async (req, res, next) => {
     next(error);
   }
 });
+
 
 module.exports = router;
