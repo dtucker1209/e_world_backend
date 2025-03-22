@@ -34,6 +34,7 @@ router.get("/", async (req, res, next) => {
     const items = await prisma.item.findMany();
     if (items.length === 0) {
       console.log("no items found in the table");
+      return res.status(200).json([]);
     } else {
       console.log("items found", items);
     }

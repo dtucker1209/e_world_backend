@@ -14,6 +14,7 @@ datasource db {
 }
 
 
+
 model User {
   id       Int       @id @default(autoincrement())
   username String    @unique
@@ -48,7 +49,7 @@ model CartItem {
   cartId   Int
   itemId   Int @unique
   price    Float
- username     String
+//  username     String
   cart     Cart   @relation(fields: [cartId], references: [id])
   @@unique([cartId, itemId]) // Ensure no duplicate items in the cart
 }

@@ -2,6 +2,10 @@ const router = require("express").Router();
 const {PrismaClient} = require("@prisma/client");
 const prisma = new PrismaClient();
 const db = require("../db");
+const jwt = require("jsonwebtoken");
+const axios = require("axios");
+
+const JWT = process.env.JWT;
 
 
 const getUser = async (id) => {
@@ -27,26 +31,31 @@ const getUser = async (id) => {
     }
   };
 
-  const fetchItemDetails = async (itemId) => {
-    try{
-    const response = await fetch(`https://fakestoreapi.com/products/${itemId}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch item details");
-  }
-    const data = await response.json();
-    return data;  // Assuming the API returns an object with item details
-}catch (error){
-  console.error("Error fetching item details", error);
-  throw error;
-}
-  };
+//   const fetchItemDetails = async (itemId) => {
+//     try{
+//     const response = await fetch(`https://fakestoreapi.com/products/${itemId}`);
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch item details");
+//   }
+//     const data = await response.json();
+//     return data;  // Assuming the API returns an object with item details
+// }catch (error){
+//   console.error("Error fetching item details", error);
+//   throw error;
+// }
+//   };
   
-  module.exports = fetchItemDetails;
+  // module.exports = fetchItemDetails;
 
 // Get ALL ITEMS IN CART:
 router.get("/", isLoggedIn, async (req, res, next) => {
     try {
         const userId = req.user.id;
+        // const itemId= req.body.id;
+
+       if (!userId) {
+          return res.status(400).json({ message: 'User ID is required' });
+        }
   
       const cart = await prisma.cart.findUnique({
         where:{userId: userId},
@@ -70,51 +79,48 @@ router.get("/", isLoggedIn, async (req, res, next) => {
 // ADD Items to Cart:
   router.post("/add", isLoggedIn, async (req, res, next) => {
     try {
-        const {userId, itemId}= req.body;
-        if (!itemId || !userId) {
-            return res.status(400).send("Item Id and UserId are required");
+
+        const itemId= +req.body.itemId;
+        const userId = req.user.id;
+
+        if (!itemId) {
+            return res.status(400).send("Item Id is required");
         }
-        // Find the item in the item table:
-      const itemDetails = await fetchItemDetails(itemId);
-        if(!itemDetails){
+        //checking if user has a cart
+        let cart = await prisma.cart.findUnique({
+          where: {userId},
+          include: {items:true},
+        });
+        //Creates a cart if it doesn't exist
+        if(!cart){
+          cart= await prisma.cart.create({
+            data:{userId}
+          });
+        }
+        //  Check if the item is already in the cart
+        // const existingCartItem = cart.item.find(item => item.itemId===itemId);
+        // if(existingCartItem){
+        //   return res.status(400).json({ message:'Item is already in your Cart'});
+        // }
+
+        // get item details from the item table
+      const item = await prisma.item.findUnique({
+        where:{id:itemId},
+      });
+        if(!item){
             return res.status(404).send("Item not found.");
         }
-         // Find or create the user's cart
-    const userCart = await prisma.cart.upsert({
-      where: { userId: userId },
-      update: {},
-      create: {
-        userId: userId,
-        items: {
-          create: {
-            itemId: itemId,
-            name: itemDetails.name,
-            price: itemDetails.price,
+        //add item to the cart
+        const newCartItem = await prisma.cartItem.create({
+          data:{
+            cartId: cart.id,
+            itemId: item.id,
+            price:item.price,
+            username:req.user.username,
           },
-        },
-      },
-    });
-        // Check if the item is already in the cart
-    const existingItem = await prismaClient.cartItem.findFirst({
-      where: {
-        cartId: userCart.id,
-        itemId: itemId,
-      },
-    });
-
-    if (existingItem) {
-      return res.status(400).json({ message: "Item already in cart" });
-    }
-
-    // If the item is not already in the cart, create a new CartItem
-    await prisma.cartItem.create({
-      data: {
-        cartId: userCart.id,
-        itemId: itemId,
-        name: itemDetails.name,
-        price: itemDetails.price,
-      },
-    });
+        });
+         // Find or create the user's cart
+  
 
     res.status(200).json({ message: "Item added to cart successfully" });
   } catch (error) {
@@ -138,12 +144,12 @@ router.delete("/item/:itemId", isLoggedIn, async (req, res, next) => {
       return res.status(404).json({ message: "Cart not found." });
     }
 
-    // Step 2: Find the specific cart item by the third-party API itemId
+    // Step 2: Find the specific cart item
     const cartItem = await prisma.cartItem.findUnique({
       where: {
         cartId_itemId: {
           cartId: cart.id,
-          itemId: itemId,  // Match the third-party API itemId
+          itemId: +itemId, 
         },
       },
     });
