@@ -30,10 +30,11 @@ model Item {
   title        String   
   description String
   price Decimal
-  image String?
+  image String? @unique
   rating Int
   count Int
   review      Review[]
+ 
   
 }
 
@@ -49,7 +50,8 @@ model CartItem {
   cartId   Int
   itemId   Int @unique
   price    Float
-//  username     String
+  itemImage String
+  itemTitle String
   cart     Cart   @relation(fields: [cartId], references: [id])
   @@unique([cartId, itemId]) // Ensure no duplicate items in the cart
 }

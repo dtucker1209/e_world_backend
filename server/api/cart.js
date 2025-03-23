@@ -77,10 +77,10 @@ router.get("/", isLoggedIn, async (req, res, next) => {
   });
 
 // ADD Items to Cart:
-  router.post("/add", isLoggedIn, async (req, res, next) => {
+  router.post("/add/:itemId", isLoggedIn, async (req, res, next) => {
     try {
 
-        const itemId= +req.body.itemId;
+        const itemId= +req.params.itemId;
         const userId = req.user.id;
 
         if (!itemId) {
@@ -116,7 +116,8 @@ router.get("/", isLoggedIn, async (req, res, next) => {
             cartId: cart.id,
             itemId: item.id,
             price:item.price,
-            username:req.user.username,
+            itemTitle: item.title,
+            itemImage: item.image
           },
         });
          // Find or create the user's cart
