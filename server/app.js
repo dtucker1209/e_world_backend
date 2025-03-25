@@ -20,7 +20,8 @@ app.use(express.static(path.join(__dirname, "..", "client/dist")));
 app.use(function(req,res,next){
   res.header(
     "Access-Control-Allow-Origin",
-    "https://steady-fudge-0afe83.netlify.app"
+    "https://steady-fudge-0afe83.netlify.app",
+    "http://localhost:5173",
   );
   res.header(
     "Access-Control-Allow-Headers",
