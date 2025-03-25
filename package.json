@@ -8,7 +8,7 @@
     "server:dev": "JWT=JWT node --watch server",
     "server:dev:windows": "set JWT=JWT && node --watch server",
     "build": "vite build client",
-    "server": "nodemon server",
+    "server": "nodemon server/index.js",
     "start": "npm run seed && npm seed"
   },
   "author": "Adrian",
